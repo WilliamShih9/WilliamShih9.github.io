@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "Country","Metro","PopulationGrowth","Population","GDP"
 "Canada","Canada",121.187328543015,34004900,39126
 "Germany","Germany",100.923540746054,81802300,40598
@@ -7,3 +8,14 @@
 "Australia","Australia",131.601010651268,22031800,39768
 "France","France",106.004466262636,64658900,40287
 "Japan","Japan",99.3338099315741,128054000,36030
+=======
+"","Country","Metro","PopulationGrowth","Population","GDP"
+"1","Canada","Canada",121.187328543015,34004900,39126
+"2","Germany","Germany",100.923540746054,81802300,40598
+"3","Poland","Poland",99.2649134731009,38022900,15910
+"4","United Kingdom","United Kingdom",112.961569361252,62510200,37265
+"5","United States","United States",115.216041043061,309327000,48691
+"6","Australia","Australia",131.601010651268,22031800,39768
+"7","France","France",106.004466262636,64658900,40287
+"8","Japan","Japan",99.3338099315741,128054000,36030
+>>>>>>> 753dbe9532e7e95ed2fbf1896bf844ed52f0c552
