@@ -128,11 +128,62 @@ plot3
 ```
 
 
+```{r}
+wider$`2018_2002` = from_to(wider, from = "2002", to = "2018")
+Population_Growth = wider %>%
+  filter(Var == "Population" & Country == "Italy") %>%
+  select(Country, Metro, `2018_2002`, `2010`)
+GDP_2002 = wider %>%
+  filter(Var == "GDP_per_capita" & Country == "Italy") %>%
+  select(Country, Metro, `2002`)
+test4 = left_join(Population_Growth, GDP_2002, by = c("Country", "Metro"))
+names(test4) = c("Country", "Metro","PopulationGrowth","Population","GDP")
+
+plot4 = ggplot(data = test4, aes(x = GDP, y = PopulationGrowth, size = Population)) + 
+                    scale_size() + theme_bw() +
+                    geom_point(data = . %>% filter(Country != Metro)) + 
+                    geom_vline(aes(xintercept = GDP),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    geom_hline(aes(yintercept = PopulationGrowth),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    xlab("GDP per capita (2015 dollars) (2002)") + ylab("Population in 2018 (2002 = 100)")+
+                    ggtitle(paste0("GDP per capita in 2002 and Population Growth (2002-2018) for Italy")) + 
+                    geom_smooth(method = "lm", mapping = aes(weight = Population), 
+                        color = "blue", show.legend = FALSE, se = FALSE)
+plot4
+```
 
 
 ```{r}
-percent = rep(0, 427)
-result = rbind(test, test2, test3)
+wider$`2018_2003` = from_to(wider, from = "2003", to = "2018")
+Population_Growth = wider %>%
+  filter(Var == "Population" & Country == "Spain") %>%
+  select(Country, Metro, `2018_2003`, `2010`)
+GDP_2002 = wider %>%
+  filter(Var == "GDP_per_capita" & Country == "Spain") %>%
+  select(Country, Metro, `2003`)
+test5 = left_join(Population_Growth, GDP_2002, by = c("Country", "Metro"))
+names(test5) = c("Country", "Metro","PopulationGrowth","Population","GDP")
+
+plot5 = ggplot(data = test5, aes(x = GDP, y = PopulationGrowth, size = Population)) + 
+                    scale_size() + theme_bw() +
+                    geom_point(data = . %>% filter(Country != Metro)) + 
+                    geom_vline(aes(xintercept = GDP),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    geom_hline(aes(yintercept = PopulationGrowth),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    xlab("GDP per capita (2015 dollars) (2003)") + ylab("Population in 2018 (2003 = 100)")+
+                    ggtitle(paste0("GDP per capita in 2003 and Population Growth (2003-2018) for Spain")) + 
+                    geom_smooth(method = "lm", mapping = aes(weight = Population), 
+                        color = "blue", show.legend = FALSE, se = FALSE)
+plot5
+```
+
+
+
+```{r}
+percent = rep(0, 478)
+result = rbind(test, test2, test3, test4, test5)
 aggregates = result %>% filter(Country == Metro)
 
 result$Percent = result$Population/left_join(result, select(aggregates, Country, Population), by = "Country")$Population.y * 100
