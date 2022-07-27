@@ -66,8 +66,8 @@ plots = test %>%
                         data = . %>% filter(Country == Metro), color = "red") +
                     xlab("GDP per capita (2015 dollars) (2001)") + ylab("Population in 2019 (2001 = 100)")+
                     ggtitle(paste0("GDP per capita in 2001 and Population Growth (2001-2019) for ",.$Country[[1]])) + 
-                    geom_smooth(method = "lm", mapping = aes(weight = Population), 
-                        color = "blue", show.legend = FALSE, se = FALSE))
+                    geom_smooth(data = . %>% filter(Country != Metro), 
+                                method = "lm", mapping = aes(weight = Population), color = "blue", show.legend = FALSE, se = FALSE))
   
 ```
 
@@ -96,8 +96,8 @@ plot2 = ggplot(data = test2, aes(x = GDP, y = PopulationGrowth, size = Populatio
                         data = . %>% filter(Country == Metro), color = "red") +
                     xlab("GDP per capita (2015 dollars) (2006)") + ylab("Population in 2018 (2006 = 100)")+
                     ggtitle(paste0("GDP per capita in 2006 and Population Growth (2006-2018) for France")) + 
-                    geom_smooth(method = "lm", mapping = aes(weight = Population), 
-                        color = "blue", show.legend = FALSE, se = FALSE)
+                    geom_smooth(data = . %>% filter(Country != Metro), 
+                                method = "lm", mapping = aes(weight = Population), color = "blue", show.legend = FALSE, se = FALSE)
 plot2
 ```
 
@@ -122,8 +122,8 @@ plot3 = ggplot(data = test3, aes(x = GDP, y = PopulationGrowth, size = Populatio
                         data = . %>% filter(Country == Metro), color = "red") +
                     xlab("GDP per capita (2015 dollars) (2001)") + ylab("Population in 2018 (2001 = 100)")+
                     ggtitle(paste0("GDP per capita in 2001 and Population Growth (2001-2018) for Japan")) + 
-                    geom_smooth(method = "lm", mapping = aes(weight = Population), 
-                        color = "blue", show.legend = FALSE, se = FALSE)
+                    geom_smooth(data = . %>% filter(Country != Metro), 
+                                method = "lm", mapping = aes(weight = Population), color = "blue", show.legend = FALSE, se = FALSE)
 plot3
 ```
 
@@ -148,8 +148,8 @@ plot4 = ggplot(data = test4, aes(x = GDP, y = PopulationGrowth, size = Populatio
                         data = . %>% filter(Country == Metro), color = "red") +
                     xlab("GDP per capita (2015 dollars) (2002)") + ylab("Population in 2018 (2002 = 100)")+
                     ggtitle(paste0("GDP per capita in 2002 and Population Growth (2002-2018) for Italy")) + 
-                    geom_smooth(method = "lm", mapping = aes(weight = Population), 
-                        color = "blue", show.legend = FALSE, se = FALSE)
+                    geom_smooth(data = . %>% filter(Country != Metro), 
+                                method = "lm", mapping = aes(weight = Population), color = "blue", show.legend = FALSE, se = FALSE)
 plot4
 ```
 
@@ -174,8 +174,8 @@ plot5 = ggplot(data = test5, aes(x = GDP, y = PopulationGrowth, size = Populatio
                         data = . %>% filter(Country == Metro), color = "red") +
                     xlab("GDP per capita (2015 dollars) (2003)") + ylab("Population in 2018 (2003 = 100)")+
                     ggtitle(paste0("GDP per capita in 2003 and Population Growth (2003-2018) for Spain")) + 
-                    geom_smooth(method = "lm", mapping = aes(weight = Population), 
-                        color = "blue", show.legend = FALSE, se = FALSE)
+                    geom_smooth(data = . %>% filter(Country != Metro), 
+                                method = "lm", mapping = aes(weight = Population), color = "blue", show.legend = FALSE, se = FALSE)
 plot5
 ```
 
@@ -194,7 +194,7 @@ write.csv(result, file = "data.csv", row.names=FALSE)
 write.csv(aggregates, file = "aggregates.csv", row.names=FALSE)
 lines = result %>%
   group_by(Country) %>%
-  do(A = lm(PopulationGrowth ~ GDP, data = ., weights = Population))
+  do(A = lm(PopulationGrowth ~ GDP, data = ., weight = Population))
 lines2 = sapply(lines[[2]], function(x){
   R2 = summary(x)$r.squared
   Pval = summary(x)$coefficients["GDP","Pr(>|t|)"]
@@ -207,5 +207,267 @@ lines3 = t(lines2)
 lines4 = data.frame(Country = lines[[1]], lines3)
 names(lines4) = c("Country","R2","Pval","Intercept","Slope")
 write.csv(lines4, file = "regression_lines.csv", row.names=FALSE)
+```
+
+
+```{r}
+New_Countries_20192001 = c("Australia","United Kingdom","United States")
+GDP_Growth = wider %>%
+  filter(Var == "GDP_per_capita" & Country %in% New_Countries_20192001) %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2019_2001`)
+Population_Growth = wider %>%
+  filter(Var == "Population" & Country %in% New_Countries_20192001) %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2019_2001`, `2010`)
+GDP_2002 = wider %>%
+  filter(Var == "GDP_per_capita" & Country %in% New_Countries_20192001) %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2001`)
+
+test6 = left_join(GDP_Growth, GDP_2002, by = c("Country", "Metro"))
+test6 = left_join(test6, Population_Growth, by = c("Country", "Metro"))
+names(test6) = c("Country", "Metro","GDPGrowth","GDP","PopulationGrowth","Population")
+
+plots6 = test6 %>%
+  drop_na() %>%
+  group_by(Country) %>%
+  do(plot = ggplot(data = ., aes(x = GDP, y = GDPGrowth, size = Population)) + 
+                    scale_size() + theme_bw() +
+                    geom_point(data = . %>% filter(Country != Metro)) + 
+                    geom_vline(aes(xintercept = GDP),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    geom_hline(aes(yintercept = GDPGrowth),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    xlab("GDP per capita (2015 dollars) (2001)") + ylab("GDP per capita in 2019 (2001 = 100)") +
+                    ggtitle(paste0("GDP per capita in 2001 and GDP per capita Growth (2001-2019) for ",.$Country[[1]])) + 
+                    geom_smooth(data = . %>% filter(Country != Metro), 
+                                method = "lm", mapping = aes(weight = Population), color = "blue", show.legend = FALSE, se = FALSE))
+```
+
+```{r}
+plots6[[2]]
+```
+
+
+```{r}
+New_Countries_20182001 = c("Germany","Poland","Canada")
+GDP_Growth = wider %>%
+  filter(Var == "GDP_per_capita" & Country %in% New_Countries_20182001) %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2018_2001`)
+Population_Growth = wider %>%
+  filter(Var == "Population" & Country %in% New_Countries_20182001 ) %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2018_2001`, `2010`)
+GDP_2002 = wider %>%
+  filter(Var == "GDP_per_capita" & Country %in% New_Countries_20182001 ) %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2001`)
+
+test7 = left_join(GDP_Growth, GDP_2002, by = c("Country", "Metro"))
+test7 = left_join(test7, Population_Growth, by = c("Country", "Metro"))
+names(test7) = c("Country", "Metro","GDPGrowth","GDP","PopulationGrowth","Population")
+
+plots7 =  test7 %>%
+  drop_na() %>%
+  group_by(Country) %>%
+  do(plot = ggplot(data = ., aes(x = GDP, y = GDPGrowth, size = Population)) + 
+                    scale_size() + theme_bw() +
+                    geom_point(data = . %>% filter(Country != Metro)) + 
+                    geom_vline(aes(xintercept = GDP),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    geom_hline(aes(yintercept = GDPGrowth),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    xlab("GDP per capita (2015 dollars) (2001)") + ylab("GDP per capita in 2018 (2001 = 100)") +
+                    ggtitle(paste0("GDP per capita in 2001 and GDP per capita Growth (2001-2018) for ",.$Country[[1]])) + 
+                    geom_smooth(data = . %>% filter(Country != Metro), 
+                                method = "lm", mapping = aes(weight = Population), color = "blue", show.legend = FALSE, se = FALSE))
+```
+
+```{r}
+plots7[[2]]
+```
+
+```{r}
+GDP_Growth = wider %>%
+  filter(Var == "GDP_per_capita" & Country == "France") %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2018_2006`)
+Population_Growth = wider %>%
+  filter(Var == "Population" & Country == "France") %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2018_2006`, `2010`)
+GDP_2002 = wider %>%
+  filter(Var == "GDP_per_capita" & Country == "France") %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2006`)
+
+test8 = left_join(GDP_Growth, GDP_2002, by = c("Country", "Metro"))
+test8 = left_join(test8, Population_Growth, by = c("Country", "Metro"))
+names(test8) = c("Country", "Metro","GDPGrowth","GDP","PopulationGrowth","Population")
+
+plot8 =  ggplot(data = test8, aes(x = GDP, y = GDPGrowth, size = Population)) + 
+                    scale_size() + theme_bw() +
+                    geom_point(data = . %>% filter(Country != Metro)) + 
+                    geom_vline(aes(xintercept = GDP),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    geom_hline(aes(yintercept = GDPGrowth),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    xlab("GDP per capita (2015 dollars) (2006)") + ylab("GDP per capita in 2018 (2006 = 100)") +
+                    ggtitle(paste0("GDP per capita in 2006 and GDP per capita Growth (2006-2018) for France")) + 
+                    geom_smooth(data = . %>% filter(Country != Metro), 
+                                method = "lm", mapping = aes(weight = Population), color = "blue", show.legend = FALSE, se = FALSE)
+plot8
+```
+
+
+```{r}
+wider$`2016_2001` = from_to(wider, from = "2001", to = "2016")
+GDP_Growth = wider %>%
+  filter(Var == "GDP_per_capita" & Country == "Japan") %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2016_2001`)
+Population_Growth = wider %>%
+  filter(Var == "Population" & Country == "Japan") %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2016_2001`, `2010`)
+GDP_2002 = wider %>%
+  filter(Var == "GDP_per_capita" & Country == "Japan") %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2001`)
+
+test9 = left_join(GDP_Growth, GDP_2002, by = c("Country", "Metro"))
+test9 = left_join(test9, Population_Growth, by = c("Country", "Metro"))
+names(test9) = c("Country", "Metro","GDPGrowth","GDP","PopulationGrowth","Population")
+
+plot9 =  ggplot(data = test9, aes(x = GDP, y = GDPGrowth, size = Population)) + 
+                    scale_size() + theme_bw() +
+                    geom_point(data = . %>% filter(Country != Metro)) + 
+                    geom_vline(aes(xintercept = GDP),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    geom_hline(aes(yintercept = GDPGrowth),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    xlab("GDP per capita (2015 dollars) (2001)") + ylab("GDP per capita in 2016 (2001 = 100)") +
+                    ggtitle(paste0("GDP per capita in 2001 and GDP per capita Growth (2001-2016) for Japan")) + 
+                    geom_smooth(data = . %>% filter(Country != Metro), 
+                                method = "lm", mapping = aes(weight = Population), color = "blue", show.legend = FALSE, se = FALSE)
+plot9
+```
+
+
+```{r}
+GDP_Growth = wider %>%
+  filter(Var == "GDP_per_capita" & Country == "Italy") %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2018_2002`)
+Population_Growth = wider %>%
+  filter(Var == "Population" & Country == "Italy") %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2018_2002`, `2010`)
+GDP_2002 = wider %>%
+  filter(Var == "GDP_per_capita" & Country == "Italy") %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2002`)
+
+test10 = left_join(GDP_Growth, GDP_2002, by = c("Country", "Metro"))
+test10 = left_join(test10, Population_Growth, by = c("Country", "Metro"))
+names(test10) = c("Country", "Metro","GDPGrowth","GDP","PopulationGrowth","Population")
+
+plot10 =  ggplot(data = test10, aes(x = GDP, y = GDPGrowth, size = Population)) + 
+                    scale_size() + theme_bw() +
+                    geom_point(data = . %>% filter(Country != Metro)) + 
+                    geom_vline(aes(xintercept = GDP),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    geom_hline(aes(yintercept = GDPGrowth),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    xlab("GDP per capita (2015 dollars) (2002)") + ylab("GDP per capita in 2018 (2002 = 100)") +
+                    ggtitle(paste0("GDP per capita in 2002 and GDP per capita Growth (2002-2018) for Italy")) + 
+                    geom_smooth(data = . %>% filter(Country != Metro), 
+                                method = "lm", mapping = aes(weight = Population), color = "blue", show.legend = FALSE, se = FALSE)
+plot10
+```
+
+
+
+```{r}
+GDP_Growth = wider %>%
+  filter(Var == "GDP_per_capita" & Country == "Spain") %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2018_2003`)
+Population_Growth = wider %>%
+  filter(Var == "Population" & Country == "Spain") %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2018_2003`, `2010`)
+GDP_2002 = wider %>%
+  filter(Var == "GDP_per_capita" & Country == "Spain") %>%
+  filter(Metro != "Austria") %>%
+  select(Country, Metro, `2003`)
+
+test11 = left_join(GDP_Growth, GDP_2002, by = c("Country", "Metro"))
+test11 = left_join(test11, Population_Growth, by = c("Country", "Metro"))
+names(test11) = c("Country", "Metro","GDPGrowth","GDP","PopulationGrowth","Population")
+
+plot11 =  ggplot(data = test11, aes(x = GDP, y = GDPGrowth, size = Population)) + 
+                    scale_size() + theme_bw() +
+                    geom_point(data = . %>% filter(Country != Metro)) + 
+                    geom_vline(aes(xintercept = GDP),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    geom_hline(aes(yintercept = GDPGrowth),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    xlab("GDP per capita (2015 dollars) (2002)") + ylab("GDP per capita in 2018 (2003 = 100)") +
+                    ggtitle(paste0("GDP per capita in 2002 and GDP per capita Growth (2003-2018) for Spain")) + 
+                    geom_smooth(data = . %>% filter(Country != Metro), 
+                                method = "lm", mapping = aes(weight = Population), color = "blue", show.legend = FALSE, se = FALSE)
+plot11
+```
+
+
+
+```{r}
+percent = rep(0, 478)
+result2 = rbind(test6, test7, test8, test9, test10, test11)
+aggregates2 = result2 %>% filter(Country == Metro)
+
+result2$Percent = result2$Population/left_join(result2, select(aggregates, Country, Population), by = "Country")$Population.y * 100
+
+plots0 = result2 %>%
+  drop_na() %>%
+  group_by(Country) %>%
+  do(plot = ggplot(data = ., aes(x = GDPGrowth, y = PopulationGrowth, size = Population)) +
+                    scale_size() + theme_bw() +
+                    geom_vline(aes(xintercept = GDPGrowth),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    geom_hline(aes(yintercept = PopulationGrowth),
+                        data = . %>% filter(Country == Metro), color = "red") +
+                    geom_point(data = . %>% filter(Country != Metro)) +  
+                    xlab("GDP per capita Growth") + ylab("Population Growth") +
+                    ggtitle(paste0("GDP per capita Growth and Population Growth for",.$Country[1])) + 
+                    geom_smooth(data = . %>% filter(Country != Metro), method = "lm", mapping = aes(weight = Population), color = "blue", show.legend = FALSE, se = FALSE))
+
+result2 = result2 %>% filter(Country != Metro)
+
+write.csv(result2, file = "data_GDP.csv", row.names=FALSE)
+write.csv(aggregates2, file = "aggregates_GDP.csv", row.names=FALSE)
+lines_next = result2 %>%
+  group_by(Country) %>%
+  do(A = lm(GDPGrowth ~ GDP, data = ., weight = Population))
+lines2_next = sapply(lines_next[[2]], function(x){
+  R2 = summary(x)$r.squared
+  Pval = summary(x)$coefficients["GDP","Pr(>|t|)"]
+  Inter = coef(x)[1]
+  Slope = coef(x)[2]
+  return(c(R2 = R2, Pval = Pval, Inter, Slope))
+})
+
+lines3_next = t(lines2_next)
+lines4_next = data.frame(Country = lines_next[[1]], lines3_next)
+names(lines4_next) = c("Country","R2","Pval","Intercept","Slope")
+write.csv(lines4_next, file = "regression_lines_GDP.csv", row.names=FALSE)
+```
+
+
+```{r}
+plots0[[2]]      
 ```
 
