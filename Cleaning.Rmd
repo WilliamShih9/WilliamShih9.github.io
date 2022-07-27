@@ -163,6 +163,7 @@ GDP_2002 = wider %>%
   filter(Var == "GDP_per_capita" & Country == "Spain") %>%
   select(Country, Metro, `2003`)
 test5 = left_join(Population_Growth, GDP_2002, by = c("Country", "Metro"))
+test5 = test5 %>% filter(Metro != "Estonia")
 names(test5) = c("Country", "Metro","PopulationGrowth","Population","GDP")
 
 plot5 = ggplot(data = test5, aes(x = GDP, y = PopulationGrowth, size = Population)) + 
@@ -406,6 +407,7 @@ GDP_2002 = wider %>%
 
 test11 = left_join(GDP_Growth, GDP_2002, by = c("Country", "Metro"))
 test11 = left_join(test11, Population_Growth, by = c("Country", "Metro"))
+test11 = test11 %>% filter(Metro != "Estonia")
 names(test11) = c("Country", "Metro","GDPGrowth","GDP","PopulationGrowth","Population")
 
 plot11 =  ggplot(data = test11, aes(x = GDP, y = GDPGrowth, size = Population)) + 

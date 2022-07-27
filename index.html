@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <head>
 <script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
 <style>
 
 .line {
@@ -11,7 +12,7 @@
 
 .grid line {
   stroke: lightgrey;
-  stroke-opacity: 0.7;
+  stroke-opacity: 0.5;
   shape-rendering: crispEdges;
 }
 
@@ -54,276 +55,470 @@ div.tooltip_reg {
 
 </style>
 </head>
-<body onload="start('Japan')">
+<body onload="init()">
 <h1>First html document</h1>
 
 <p>This is my first sentence</p>
 
+<button id="scene1">Slide 1</button>
+<button id="scene2">Slide 2</button>
+<button id="scene3">Slide 3</button>
+<button id="scene4">Slide 4</button>
+<button id="scene5">Slide 5</button>
+<button id="scene6">Slide 6</button>
+<select id="selectButton" hidden="hidden">></select>
+<select id="yaxisButton" hidden="hidden">></select>
 <svg>
 
 </svg>
 
 <script>
 
-var tooltip = d3.select("body").append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
-    
-var tooltip2 = d3.select("body").append("div")
-    .attr("class", "tooltip2")
-    .style("opacity", 0);
-    
-var tooltip_reg = d3.select("body").append("div")
-    .attr("class", "tooltip2")
-    .style("opacity", 0);
-    
-function get_labels(country){
-    switch(country){
-        case 'France':
-            one = "GDP per capita (2015 dollars)(2006)";
-            two = "Population in 2018 (2006=100)";
-            three = "GDP per capita in 2006 and Population Growth (2006−2018) for France";
-            return [one, two, three];
-        case 'Japan':
-            one = "GDP per capita (2015 dollars)(2001)";
-            two = "Population in 2018 (2001=100)";
-            three = "GDP per capita in 2001 and Population Growth (2001−2018) for Japan";
-            return [one, two, three];
-        case 'Italy':
-            one = "GDP per capita (2015 dollars) (2002)";
-            two = "Population in 2018 (2002 = 100)";
-            three = "GDP per capita in 2002 and Population Growth (2002−2018) for Italy";
-            return [one, two, three];
-        case 'Spain':
-            one = "GDP per capita (2015 dollars) (2003)";
-            two = "Population in 2018 (2003 = 100)";
-            three = "GDP per capita in 2003 and Population Growth (2003−2018) for Spain";
-        default:
-            one = "GDP per capita (2015 dollars)(2001)";
-            two = "Population in 2019 (2001=100)";
-            three = "GDP per capita in 2001 and Population Growth (2001−2019) for "+country;
-            return [one, two, three];
+function get_labels(country, yaxis = "PopulationGrowth"){
+    if (yaxis == "PopulationGrowth"){
+        switch(country){
+            case 'France':
+                x = "GDP per capita (2015 dollars)(2006)";
+                y = "Population in 2018 (2006=100)";
+                title = "GDP per capita in 2006 and Population Growth (2006−2018) for France";
+                return [x, y, title];
+            case 'Japan':
+                x = "GDP per capita (2015 dollars)(2001)";
+                y = "Population in 2018 (2001=100)";
+                title = "GDP per capita in 2001 and Population Growth (2001−2018) for Japan";
+                return [x, y, title];
+            case 'Italy':
+                x = "GDP per capita (2015 dollars)(2002)";
+                y = "Population in 2018 (2002 = 100)";
+                title = "GDP per capita in 2002 and Population Growth (2002−2018) for Italy";
+                return [x, y, title];
+            case 'Spain':
+                x = "GDP per capita (2015 dollars)(2003)";
+                y = "Population in 2018 (2003 = 100)";
+                title = "GDP per capita in 2003 and Population Growth (2003−2018) for Spain";
+                return [x, y, title];
+            default:
+                x = "GDP per capita (2015 dollars)(2001)";
+                y = "Population in 2019 (2001=100)";
+                title  = "GDP per capita in 2001 and Population Growth (2001−2019) for "+country;
+                return [x, y, title];
+        }
+    }
+    else if (yaxis == "GDPGrowth"){
+        switch(country){
+            case 'France':
+                x = "GDP per capita (2015 dollars)(2006)";
+                y = "GDP per capita in 2018 (2006 = 100)";
+                title = "GDP per capita in 2006 and GDP per capita Growth (2006−2018) for France";
+                return [x, y, title];
+            case 'Japan':
+                x = "GDP per capita (2015 dollars)(2001)";
+                y = "GDP per capita in 2016 (2001 = 100)";
+                title = "GDP per capita in 2001 and GDP per capita Growth (2001−2016) for Japan";
+                return [x, y, title];
+            case 'Italy':
+                x = "GDP per capita (2015 dollars)(2002)";
+                y = "GDP per capita in 2018 (2002 = 100)";
+                title = "GDP per capita in 2002 and GDP per capita Growth (2002−2018) for Italy";
+                return [x, y, title];
+            case 'Spain':
+                x = "GDP per capita (2015 dollars)(2003)";
+                y = "GDP per capita in 2018 (2003 = 100)";
+                title = "GDP per capita in 2003 and GDP per capita Growth (2003−2018) for Spain";
+                return [x, y, title];
+            case 'Canada':
+            case 'Germany':
+            case 'Poland':
+                x = "GDP per capita (2015 dollars)(2001)";
+                y = "GDP per capita in 2018 (2001 = 100)";
+                title = "GDP per capita in 2001 and GDP per capita Growth (2001-2018) for"+country;
+                return [x, y, title];
+            default:
+                x = "GDP per capita (2015 dollars)(2001)";
+                y = "GDP per capita in 2019 (2001 = 100)";
+                title = "GDP per capita in 2001 and GDP per capita Growth (2001-2019) for "+country;
+                return [x, y, title];
+        }
     }
 }
-async function start(country){
+
+function get_GDPyr(country){
+    switch(country){
+        case 'France':
+            return "2006";
+        case 'Spain':
+            return "2003";
+        case 'Italy':
+            return "2002";
+        default:
+            return "2001";
+    }
+}
+async function init(){
     var margin = 50;
-    var width = 550;
+    var width = 650;
     var height = 550;
-    var data = await d3.csv("https://raw.githubusercontent.com/WilliamShih9/WilliamShih9.github.io/main/data.csv", d3.autoType);
-    var aggregate = await d3.csv("https://raw.githubusercontent.com/WilliamShih9/WilliamShih9.github.io/main/aggregates.csv", d3.autoType);
-    var lines = await d3.csv("https://raw.githubusercontent.com/WilliamShih9/WilliamShih9.github.io/main/regression_lines.csv", d3.autoType);
+    var tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
     
-    // Agg Data is for the Vertical/Horizontal Line
-    agg_data = aggregate.filter(function(row) {
-        return row['Country'] == country;
-    });
-    
-    // Line Data is for the Regression Line
-    line_data = lines.filter(function(row) {
-        return row['Country'] == country;
-    });
-    filt_data = data.filter(function(row) {
-        return row['Country'] == country;
-    });
-    
-    var x_min = d3.min(filt_data, function(d) { return d.GDP; });
-    var x_max = d3.max(filt_data, function(d) { return d.GDP; });
-    var y_min = d3.min(filt_data, function(d) { return d.PopulationGrowth; }) - 5;
-    var y_max = d3.max(filt_data, function(d) { return d.PopulationGrowth; }) + 5;
-    
-    
-    var x = d3.scaleLinear().domain([x_min, x_max]).range([0, width]).nice();
-    var y = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]).nice();
-    var sqrtScale = d3.scaleSqrt().domain([0, 100]).range([0, 60]);
-    
-    d3.select("svg")
-        .attr("width", width + 2*margin)
-        .attr("height", height + 2*margin);
-
-    // X Gridlines
-    d3.select("svg").append("g")
-        .attr("class", "grid")
-        .attr("transform","translate("+margin+","+(height+margin)+")")
-        .call(d3.axisBottom(x).tickSize(-height).tickFormat('').ticks(10));
-      
-    // Y Gridlines
-    d3.select("svg").append("g")
-        .attr("class", "grid")
-        .attr("transform","translate("+margin+","+margin+")")
-        .call(d3.axisLeft(y).tickSize(-width).tickFormat('').ticks(10));
+    var tooltip2 = d3.select("body").append("div")
+        .attr("class", "tooltip2")
+        .style("opacity", 0);
         
-    // X Axis
-    d3.select("svg").append("g")
-        .attr("transform","translate("+margin+","+(height+margin)+")")
-        .call(d3.axisBottom(x).ticks(10));
+    var tooltip_reg = d3.select("body").append("div")
+        .attr("class", "tooltip2")
+        .style("opacity", 0);
     
-    // Y Axis
-    d3.select("svg").append("g")
-        .attr("transform","translate("+margin+","+margin+")")
-        .call(d3.axisLeft(y).ticks(10));
-     
-    // Get Labels for X-Axis, Y-Axis, Title for Country
-    result = get_labels(country);
-    x_axis_label = result[0];
-    y_axis_label = result[1];
-    title = result[2];
-    // Text Label X Axis
-    d3.select("svg").append("text")             
-      .attr("transform",
-            "translate(" + ((width+margin)/2) + " ," + 
-                           (height + 2*margin - 10) + ")")
-      .style("text-anchor", "middle")
-      .text(x_axis_label);   
-     
-    // text label for the y axis
-    d3.select("svg").append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 0)
-      .attr("x" ,0 - ((height + margin) / 2))
-      .attr("dy", "1em")
-      .style("text-anchor", "middle")
-      .text(y_axis_label);  
-    
-    // Title
-    d3.select("svg").append("text")
-        .attr("transform", "translate("+margin+","+margin+")")
-        .attr("x", (width / 2))             
-        .attr("y", 0 - (margin / 2))
-        .attr("text-anchor", "middle")  
-        .style("font-size", "16px") 
-        .style("text-decoration", "underline")  
-        .text(title);
-
-    h_line = agg_data[0]["PopulationGrowth"];
-    // Horizontal Line
-    d3.select("svg").append("g")
-       .attr("class","hline")
-       .attr("transform", "translate("+margin+", "+(margin+y(h_line))+")")
-       .append("line")
-       .attr("x2", width)
-       .style("stroke", "#cc3e2e")
-       .style("stroke-width", "4px")
-    
-    v_line = agg_data[0]["GDP"];
-    // Vertical Line
-    d3.select("svg").append("g")
-       .attr("class", "vline")
-       .attr("transform", "translate("+(margin+x(v_line))+","+margin+")")
-       .append("line")
-       .attr("y2", width)
-       .style("stroke", "#cc3e2e")
-       .style("stroke-width", "4px")
-       
-    slope = line_data[0]["Slope"]
-    intercept = line_data[0]["Intercept"]
-    y_reg_low = x_min * slope + intercept;
-    y_reg_high = x_max * slope + intercept;
-    // Regression Line
-    d3.select("svg").append("g")
-        .attr("class","regline")
-        .attr("transform","translate("+margin+","+margin+")")
-        .append("line")
-        .attr("x1", x(x_min))
-        .attr("x2", x(x_max))
-        .attr("y1", y(y_reg_low))
-        .attr("y2", y(y_reg_high))
-        .style("stroke", "#2e31cc")
-        .style("stroke-width", "4px")
+    // Country Select Button
+    countries = ['Australia','Canada','France','Germany','Italy','Japan','Poland',
+                'Spain','United Kingdom','United States'];
+    d3.select("#selectButton")
+        .selectAll('myOptions')
+        .data(countries)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; }) // text showed in the menu
+        .attr("value", function (d) { return d; });
+    // Y Axis GDP per capita Button or Population growth button
+    yaxis = ['Population Growth on Y-Axis','GDP Growth on Y-Axis']
+    d3.select("#yaxisButton")
+        .selectAll('myOptions')
+        .data(yaxis)
+        .enter()
+        .append('option')
+        .text(function (d) { return d; }) // text showed in the menu
+        .attr("value", function (d) { return d; });
     
     // Data
-    d3.select("svg").append("g")
-        .attr("transform", "translate(" +margin+ "," +margin+ ")")
-        .selectAll("dot")
-        .data(filt_data)
-        .enter().append("circle")
-        .attr("cx", function (d) { return x(d.GDP); })
-        .attr("cy", function (d) { return y(d.PopulationGrowth); })
-        .attr("r",  function (d) { return sqrtScale(d.Percent); });
+    var data = await d3.csv("https://raw.githubusercontent.com/WilliamShih9/WilliamShih9.github.io/main/data_GDP.csv", d3.autoType);
+    var aggregate = await d3.csv("https://raw.githubusercontent.com/WilliamShih9/WilliamShih9.github.io/main/aggregates_GDP.csv", d3.autoType);
     
+    async function draw_chart(data, aggregate, country = "Japan", yaxis = "PopulationGrowth"){
+        d3.select("svg").selectAll('*').remove();
+        let lines;
+        if (yaxis == "PopulationGrowth"){
+            lines = await d3.csv("https://raw.githubusercontent.com/WilliamShih9/WilliamShih9.github.io/main/regression_lines.csv", d3.autoType);
+        }
+        else if (yaxis == "GDPGrowth"){
+            lines = await d3.csv("https://raw.githubusercontent.com/WilliamShih9/WilliamShih9.github.io/main/regression_lines_GDP.csv", d3.autoType);
+        }
+        
+        // Agg Data is for the Vertical/Horizontal Line
+        agg_data = aggregate.filter(function(row) {
+            return row['Country'] == country;
+        });
+        
+        // Line Data is for the Regression Line
+        line_data = lines.filter(function(row) {
+            return row['Country'] == country;
+        });
+        filt_data = data.filter(function(row) {
+            return row['Country'] == country;
+        });
+        
+        var x_min = d3.min(filt_data, function(d) { return d.GDP; });
+        var x_max = d3.max(filt_data, function(d) { return d.GDP; });
+        var y_min = d3.min(filt_data, function(d) { return d[yaxis]; }) - 5;
+        var y_max = d3.max(filt_data, function(d) { return d[yaxis]; }) + 5;
+        
+        
+        var x = d3.scaleLinear().domain([x_min, x_max]).range([0, width]).nice();
+        var y = d3.scaleLinear().domain([y_min, y_max]).range([height, 0]).nice();
+        var sqrtScale = d3.scaleSqrt().domain([0, 100]).range([0, 70]);
+        
+        d3.select("svg")
+            .attr("width", width + 2*margin)
+            .attr("height", height + 2*margin);
     
-    // Tooltip for Circles
-    d3.select("svg").selectAll("circle").data(filt_data)
-        .on("mouseover", function(event, d) {		
-            tooltip.transition()		
-                .duration(200)		
-                .style("opacity", .9);		
-            tooltip.html(d.Metro + "<br/>"  + "Pop(2010):"+d3.format(',')(d.Population)
-                        + "<br/>" + "GDP(2001):" + d3.format(',')(d.GDP))
-                .style("left", (event.pageX) + "px")		
-                .style("top", (event.pageY - 28) + "px");	
-        })	
-        .on("mousemove", function(event){
-            tooltip
-                .style("left", (event.pageX) + "px")
-                .style("top", (event.pageY- 28) + "px");
-        })
-        .on("mouseout", function(event) {		
-            tooltip.transition()		
-                .duration(500)		
-                .style("opacity", 0);	
-        });
+        // X Gridlines
+        d3.select("svg").append("g")
+            .attr("class", "grid")
+            .attr("transform","translate("+margin+","+(height+margin)+")")
+            .call(d3.axisBottom(x).tickSize(-height).tickFormat('').ticks(10));
+          
+        // Y Gridlines
+        d3.select("svg").append("g")
+            .attr("class", "grid")
+            .attr("transform","translate("+margin+","+margin+")")
+            .call(d3.axisLeft(y).tickSize(-width).tickFormat('').ticks(10));
+            
+        // X Axis
+        d3.select("svg").append("g")
+            .style("font-size","11px")
+            .attr("transform","translate("+margin+","+(height+margin)+")")
+            .call(d3.axisBottom(x).ticks(10));
+        
+        // Y Axis
+        d3.select("svg").append("g")
+            .style("font-size","12px")
+            .attr("transform","translate("+margin+","+margin+")")
+            .call(d3.axisLeft(y).ticks(10));
+         
+        // Get Labels for X-Axis, Y-Axis, Title for Country
+        result = get_labels(country, yaxis);
+        x_axis_label = result[0];
+        y_axis_label = result[1];
+        title = result[2];
+        // Text Label X Axis
+        d3.select("svg").append("text")             
+          .attr("transform",
+                "translate(" + ((width+margin)/2) + " ," + 
+                               (height + 2*margin - 10) + ")")
+          .style("font-size","17px")
+          .style("text-anchor", "middle")
+          .text(x_axis_label);   
+         
+        // text label for the y axis
+        d3.select("svg").append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 0)
+          .attr("x" ,0 - ((height + margin) / 2))
+          .attr("dy", "1em")
+          .style("font-size","17px")
+          .style("text-anchor", "middle")
+          .text(y_axis_label);  
+        
+        // Title
+        d3.select("svg").append("text")
+            .attr("transform", "translate("+margin+","+margin+")")
+            .attr("x", (width / 2))             
+            .attr("y", 0 - (margin / 2))
+            .attr("text-anchor", "middle")  
+            .style("font-size", "17px") 
+            .style("text-decoration", "underline")  
+            .text(title);
     
-    // Tooltip for Horizontal  Line
-    d3.select("svg").select(".hline")
-        .on("mouseover", function(event, d) {		
-            tooltip2.transition()		
-                .duration(200)		
-                .style("opacity", .9);		
-            tooltip2.html(country+"<br/>"+ y_axis_label + ": " + d3.format(".2f")(h_line))
-                .style("left", (event.pageX) + "px")		
-                .style("top", (event.pageY + 18) + "px");	
-        })	
-        .on("mousemove", function(event){
-            tooltip2
-                .style("left", (event.pageX) + "px")
-                .style("top", (event.pageY + 18) + "px");
-        })
-        .on("mouseout", function(event) {		
-            tooltip2.transition()		
-                .duration(500)		
-                .style("opacity", 0);	
-        });
-    // Tooltip for Vertical Line
-    d3.select("svg").select(".vline")
-        .on("mouseover", function(event, d) {		
-            tooltip2.transition()		
-                .duration(200)		
-                .style("opacity", .9);		
-            tooltip2.html(country+"<br/>"+ x_axis_label + ": " + d3.format(',')(v_line))
-                .style("left", (event.pageX) + "px")		
-                .style("top", (event.pageY + 18) + "px");	
-        })	
-        .on("mousemove", function(event){
-            tooltip2
-                .style("left", (event.pageX) + "px")
-                .style("top", (event.pageY + 18) + "px");
-        })
-        .on("mouseout", function(event) {		
-            tooltip2.transition()		
-                .duration(500)		
-                .style("opacity", 0);	
-        });
-    // Tooltip for Regression Line
-    d3.select("svg").select(".regline")
-        .on("mouseover", function(event, d) {		
-            tooltip_reg.transition()		
-                .duration(200)		
-                .style("opacity", .9);		
-            tooltip_reg.html("Regression Line <br/>"+"R^2 of line: "+
-                d3.format('.3f')(line_data[0]["R2"]))
-                .style("left", (event.pageX) + "px")		
-                .style("top", (event.pageY + 18) + "px");	
-        })	
-        .on("mousemove", function(event){
-            tooltip_reg
-                .style("left", (event.pageX) + "px")
-                .style("top", (event.pageY + 18) + "px");
-        })
-        .on("mouseout", function(event) {		
-            tooltip_reg.transition()		
-                .duration(500)		
-                .style("opacity", 0);	
-        });
+        h_line = agg_data[0][yaxis];
+        
+        // Add Annotations
+        const annotations = [
+          {
+            note: {
+              label: "Tokyo is the richest city in Japan and had the fastest population growth"
+            },
+            type: d3.annotationCalloutCircle,
+            subject: {
+              radius: 60,        
+            },
+            color: ["green"],
+            x: 683,
+            y: 160,
+            dy: -20,
+            dx: -60
+          },
+          {
+            note: {
+              label: "Nagoya is relatively rich and relatively fast population growth"
+            },
+            type: d3.annotationCalloutCircle,
+            subject: {
+              radius: 40,        
+            },
+            color: ["green"],
+            x: 543,
+            y: 230,
+            dy: 70,
+            dx: 60
+          }
+        ];
+        const makeAnnotations = d3.annotation()
+              .annotations(annotations);
+        d3.select("svg")
+            .append("g")
+            .call(makeAnnotations);
+            
+        // Horizontal Line
+        d3.select("svg").append("g")
+           .attr("class","hline")
+           .attr("transform", "translate("+margin+", "+(margin+y(h_line))+")")
+           .append("line")
+           .attr("x2", width)
+           .style("stroke", "#cc3e2e")
+           .style("stroke-width", "4px")
+        
+        v_line = agg_data[0]["GDP"];
+        // Vertical Line
+        d3.select("svg").append("g")
+           .attr("class", "vline")
+           .attr("transform", "translate("+(margin+x(v_line))+","+margin+")")
+           .append("line")
+           .attr("y2", height)
+           .style("stroke", "#cc3e2e")
+           .style("stroke-width", "4px")
+           
+        slope = line_data[0]["Slope"]
+        intercept = line_data[0]["Intercept"]
+        y_reg_low = x_min * slope + intercept;
+        y_reg_high = x_max * slope + intercept;
+        // Regression Line
+        d3.select("svg").append("g")
+            .attr("class","regline")
+            .attr("transform","translate("+margin+","+margin+")")
+            .append("line")
+            .attr("x1", x(x_min))
+            .attr("x2", x(x_max))
+            .attr("y1", y(y_reg_low))
+            .attr("y2", y(y_reg_high))
+            .style("stroke", "#2e31cc")
+            .style("stroke-width", "4px")
+        
+        // Data
+        d3.select("svg").append("g")
+            .attr("transform", "translate(" +margin+ "," +margin+ ")")
+            .selectAll("dot")
+            .data(filt_data)
+            .enter().append("circle")
+            .attr("cx", function (d) { return x(d.GDP); })
+            .attr("cy", function (d) { return y(d[yaxis]); })
+            .attr("r",  function (d) { return sqrtScale(d.Percent); })
+        
+        
+        // Tooltip for Circles
+        d3.select("svg").selectAll("circle").data(filt_data)
+            .on("mouseover", function(event, d) {		
+                tooltip.transition()		
+                    .duration(200)		
+                    .style("opacity", .9);		
+                tooltip.html(d.Metro + "<br/>"  + "Pop(2010):"+d3.format(',')(d.Population)
+                            + "<br/>" + "GDP(" + get_GDPyr(country) + "):" + d3.format(',')(d.GDP))
+                    .style("left", (event.pageX) + "px")		
+                    .style("top", (event.pageY - 28) + "px");	
+            })	
+            .on("mousemove", function(event){
+                tooltip
+                    .style("left", (event.pageX) + "px")
+                    .style("top", (event.pageY- 28) + "px");
+            })
+            .on("mouseout", function(event) {		
+                tooltip.transition()		
+                    .duration(500)		
+                    .style("opacity", 0);	
+            });
+        
+        // Tooltip for Horizontal  Line
+        d3.select("svg").select(".hline")
+            .on("mouseover", function(event, d) {		
+                tooltip2.transition()		
+                    .duration(200)		
+                    .style("opacity", .9);		
+                tooltip2.html(country+"<br/>"+ y_axis_label + ": " + d3.format(".2f")(h_line))
+                    .style("left", (event.pageX) + "px")		
+                    .style("top", (event.pageY + 18) + "px");	
+            })	
+            .on("mousemove", function(event){
+                tooltip2
+                    .style("left", (event.pageX) + "px")
+                    .style("top", (event.pageY + 18) + "px");
+            })
+            .on("mouseout", function(event) {		
+                tooltip2.transition()		
+                    .duration(500)		
+                    .style("opacity", 0);	
+            });
+        // Tooltip for Vertical Line
+        d3.select("svg").select(".vline")
+            .on("mouseover", function(event, d) {		
+                tooltip2.transition()		
+                    .duration(200)		
+                    .style("opacity", .9);		
+                tooltip2.html(country+"<br/>"+ x_axis_label + ": " + d3.format(',')(v_line))
+                    .style("left", (event.pageX) + "px")		
+                    .style("top", (event.pageY + 18) + "px");	
+            })	
+            .on("mousemove", function(event){
+                tooltip2
+                    .style("left", (event.pageX) + "px")
+                    .style("top", (event.pageY + 18) + "px");
+            })
+            .on("mouseout", function(event) {		
+                tooltip2.transition()		
+                    .duration(500)		
+                    .style("opacity", 0);	
+            });
+        // Tooltip for Regression Line
+        d3.select("svg").select(".regline")
+            .on("mouseover", function(event, d) {		
+                tooltip_reg.transition()		
+                    .duration(200)		
+                    .style("opacity", .9);		
+                tooltip_reg.html("Regression Line <br/>"+"R^2 of line: "+
+                    d3.format('.3f')(line_data[0]["R2"]))
+                    .style("left", (event.pageX) + "px")		
+                    .style("top", (event.pageY + 18) + "px");	
+            })	
+            .on("mousemove", function(event){
+                tooltip_reg
+                    .style("left", (event.pageX) + "px")
+                    .style("top", (event.pageY + 18) + "px");
+            })
+            .on("mouseout", function(event) {		
+                tooltip_reg.transition()		
+                    .duration(500)		
+                    .style("opacity", 0);	
+            });
+    }
+    d3.select("#selectButton").property('value', "Japan");
+    d3.select("#yaxisButton").property('value','Population Growth on Y-Axis');
+    draw_chart(data, aggregate, "Japan", "PopulationGrowth");
+    
+    d3.select("#scene1").on("click", function() {  
+        d3.select("#selectButton").property('value', "Japan");
+        d3.select("#yaxisButton").property('value','Population Growth on Y-Axis');
+        draw_chart(data, aggregate, "Japan", "PopulationGrowth");
+    });
+    d3.select("#scene2").on("click", function() {  
+        d3.select("#selectButton").property('value', "Japan");
+        d3.select("#yaxisButton").property('value','GDP Growth on Y-Axis');
+        draw_chart(data, aggregate, "Japan", "GDPGrowth");
+    });
+    d3.select("#scene3").on("click", function() {  
+        d3.select("#selectButton").property('value', "United States");
+        d3.select("#yaxisButton").property('value','Population Growth on Y-Axis');
+        draw_chart(data, aggregate, "United States", "PopulationGrowth");
+    });
+    d3.select("#scene4").on("click", function() {  
+        d3.select("#selectButton").property('value', "United States");
+        d3.select("#yaxisButton").property('value','GDP Growth on Y-Axis');
+        draw_chart(data, aggregate, "United States", "GDPGrowth");
+    });
+    d3.select("#scene5").on("click", function() {  
+        d3.select("#selectButton").property('value', "France");
+        d3.select("#yaxisButton").property('value','Population Growth on Y-Axis');
+        draw_chart(data, aggregate, "France", "PopulationGrowth");
+    });
+    d3.select("#scene6").on("click", function() {  
+        d3.select("#selectButton").property('value', "France");
+        d3.select("#yaxisButton").property('value','GDP Growth on Y-Axis');
+        draw_chart(data, aggregate, "France", "GDPGrowth");
+        // Unhide Buttons
+        document.getElementById("selectButton").removeAttribute("hidden");
+        document.getElementById("yaxisButton").removeAttribute("hidden"); 
+        
+        d3.select("#selectButton")
+            .on("change", function (event){
+                yaxis_val = d3.select("#yaxisButton").node().value;
+                country_val = d3.select("#selectButton").node().value;
+                if (yaxis_val == "GDP Growth on Y-Axis"){
+                    draw_chart(data, aggregate, country_val, "GDPGrowth");
+                }
+                else if (yaxis_val == "Population Growth on Y-Axis"){
+                    draw_chart(data, aggregate, country_val, "PopulationGrowth");
+                }
+            });
+        d3.select("#yaxisButton")
+            .on("change", function (event){
+                yaxis_val = d3.select("#yaxisButton").node().value;
+                country_val = d3.select("#selectButton").node().value;
+                if (yaxis_val == "GDP Growth on Y-Axis"){
+                    draw_chart(data, aggregate, country_val, "GDPGrowth");
+                }
+                else if (yaxis_val == "Population Growth on Y-Axis"){
+                    draw_chart(data, aggregate, country_val, "PopulationGrowth");
+                }
+            });
+    });
+    
 }
 
 </script>
