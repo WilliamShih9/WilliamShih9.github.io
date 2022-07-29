@@ -77,10 +77,19 @@ select{
     padding: 3px 1px; /* Some padding */
 }
 
+p {
+   word-wrap: break-word;
+   text-align: left;		
+   width:90%;
+   max-width: 1000px;
+   margin:0 auto;
+   line-height: 1.6;
+}
+
 </style>
 </head>
 <body onload="init()">
-<h1>GDP per capita vs Population Growth of Metro Areas in the OECD</h1>
+<h1>GDP per capita vs Population Growth of Metro Areas of Major Developed Countries</h1>
 
 
 <div class="bgroup">
@@ -97,7 +106,7 @@ select{
 
 <p id="maintext"></p>
 
-<div>
+<div style="text-align:center;">
 <hr id = "hiddenhr" style="height:2px;border-width:0;color:gray;background-color:gray" hidden="hidden">
 <select id="selectButton" hidden="hidden">></select>
 <select id="yaxisButton" hidden="hidden">></select>
@@ -106,13 +115,35 @@ select{
 
 <hr style="height:2px;border-width:0;color:gray;background-color:gray">
 
+<div style="text-align:center;">
 <svg>
 
 </svg>
+</div>
 
-<hr style="height:2px;border-width:0;color:gray;background-color:gray">
 
-<p id="bottomtext">This is the bottom text</p>
+
+<p id="bottomtext" hidden = "hidden"><br/><br/>Notes: 1. GDP per capita is adjusted for purchasing 
+    power parity (PPP).<br/> 2. The population used to obtain the size of the circles is for 
+    2010 to represent the midpoint of the range of years.<br/>
+    3. The size of the circle represents the percent of the national population to keep 
+    the circles consistent across plots. <br/> 4. The red lines 
+    represent the national average (all rural and urban areas combined). <br/> 5. Note that the 
+    starting year and ending year differs between plots due to data limitations. 
+    <br/> 6. When hovering over the blue regression line,
+    the R^2 and p-value of the regression line are shown. The higher the
+    R^2 (ranging from 0 to 1), the better line fits the data. The lower the p-value,
+    the greater the statistical significance of the observed difference of the regression line 
+    from a horizontal line. p < 0.05 is considered significant. 
+    <br/> Data File: 
+    <a href="https://github.com/WilliamShih9/WilliamShih9.github.io/blob/main/data_GDP.csv" target="_blank">
+    https://github.com/WilliamShih9/WilliamShih9.github.io/blob/main/data_GDP.csv</a><br/> 
+    Raw Downloaded Data: <a href="https://github.com/WilliamShih9/WilliamShih9.github.io/blob/main/CITIES_26072022091653320.csv"  target="_blank">
+    https://github.com/WilliamShih9/WilliamShih9.github.io/blob/main/CITIES_26072022091653320.csv
+    </a> 
+    <br/> Raw Data Source: 
+    <a href="https://stats.oecd.org/Index.aspx?DataSetCode=CITIES#" target="_blank">
+    https://stats.oecd.org/Index.aspx?DataSetCode=CITIES#</a></p>
 
 <script>
 
@@ -121,12 +152,12 @@ function get_labels(country, yaxis = "PopulationGrowth"){
         switch(country){
             case 'France':
                 x = "GDP per capita (2015 dollars)(2006)";
-                y = "Population in 2018 (2006=100)";
+                y = "Population in 2018 (2006 = 100)";
                 title = "GDP per capita in 2006 and Population Growth (2006−2018) by Metro Area for France";
                 return [x, y, title];
             case 'Japan':
                 x = "GDP per capita (2015 dollars)(2001)";
-                y = "Population in 2018 (2001=100)";
+                y = "Population in 2018 (2001 = 100)";
                 title = "GDP per capita in 2001 and Population Growth (2001−2018) by Metro Area for Japan";
                 return [x, y, title];
             case 'Italy':
@@ -141,7 +172,7 @@ function get_labels(country, yaxis = "PopulationGrowth"){
                 return [x, y, title];
             default:
                 x = "GDP per capita (2015 dollars)(2001)";
-                y = "Population in 2019 (2001=100)";
+                y = "Population in 2019 (2001 = 100)";
                 title  = "GDP per capita in 2001 and Population Growth (2001−2019) by Metro Area for "+country;
                 return [x, y, title];
         }
@@ -173,7 +204,7 @@ function get_labels(country, yaxis = "PopulationGrowth"){
             case 'Poland':
                 x = "GDP per capita (2015 dollars)(2001)";
                 y = "GDP per capita in 2018 (2001 = 100)";
-                title = "GDP per capita in 2001 and GDP per capita Growth (2001-2018) by Metro Area for"+country;
+                title = "GDP per capita in 2001 and GDP per capita Growth (2001-2018) by Metro Area for "+country;
                 return [x, y, title];
             default:
                 x = "GDP per capita (2015 dollars)(2001)";
@@ -234,19 +265,116 @@ function country_population(population, yaxis){
 function get_text(num_scene){
     switch (num_scene){
         case 0:
-            return "This is Scene 0";
+            return `Housing is a very big issue in many countries as 
+                real housing prices have increased dramatically over the past 20
+                years as interest rates have fallen. As interest rates fall due
+                to slowing economies, the housing prices increase as it is
+                easier to borrow money. In most cases, housing prices
+                increased because restrictive housing regulations make it
+                difficult for supply to meet demand. <br/><br/> However, the restrictions on
+                housing are not equal within countries. In some countries, 
+                high-density housing is much more restrictive than low-density housing.
+                If a city runs out of space to build low-density housing,
+                then new housing may be severely limited. Wealthy cities
+                are much more likely to meet this limit as these are 
+                the cities that people move to, while people don't want
+                to move to poorer cities anyways. <br/><br/>
+                Click through the slides in order to see illustrate how differences in 
+                housing markets between countries result in differences in
+                population growth in relatively rich and poor cities in those countries. Keep in 
+                mind these plots only show the relative housing 
+                shortage, not an absolute housing shortage. If every city in a country somehow has an equally severe housing shortage, it won't be shown through these plots.
+            `;
         case 1:
-            return "This is Scene 1";
+            return `A plot of GDP per capita 
+                (roughly equivalent to income per person)
+                versus Population Growth tells us whether
+                housing production is limited in the richest cities relative to poor cities.
+                If housing was not limited, people would move from poor cities to
+                rich cities. Therefore, rich cities should grow faster than poor cities.
+                The regression line below would be upward sloping in that case.
+                <br/><br/>
+                Japan is a famous example where this is the case.
+                Tokyo is the richest and largest city in Japan while having the fastest
+                population growth. Japan is known to have flexible 
+                housing laws that allow for housing construction even in population dense areas.
+                <br/>
+                If interested in specific details, 
+                hover over any line (red/blue) or circle to see more information. .
+            `;
         case 2:
-            return "This is Scene 2";
+            return `A plot of GDP per capita versus GDP  per capita growth would 
+                tells us if the income per person were converging or diverging. If cities
+                with higher initial GDP per capita had lower GDP per capita growth, the income per
+                preson would be converging and the regression line would be downward sloping.
+                This is related to housing since with unlimited mobility, income per person
+                would converge as people would move from poorer to richer cities. 
+                <br/><br/>
+                This is roughly the case in Japan although the significance of the regression
+                line is not impressive. Tokyo's GDP per capita growth was slightly lower
+                than the national average. At least the line is not upward sloping (which would 
+                imply the rich getting relatively richer and poor getting relatively poorer)
+                as it is in some other countries as you will see later on.
+            `;
         case 3:
-            return "This is Scene 3";
+            return `In contrast to Japan, the United States is a good example
+                where housing is severely limited in cities that have run out of space
+                to build low-density housing. New York City is one of the richest cities
+                and is the largest city in the US but had one of the lowest population growth
+                of any city. Similarly, San Francisco was the richest city in 2001 and 
+                its population grew slower than the national average.
+                <br/><br/>
+                While many rich cities already ran out of space for
+                low-density housing by the early 2000s, there are three notable cities: 
+                Houston, Dallas, and Atlanta. These 3 cities were wealthy in 2001 
+                and did not run out of space for low-density housing yet. Unlike
+                San Francisco (peninsula)
+                and New York (island/peninsula), they are not constrained by geography.
+                It is still possible they may run out of space soon 
+                and population will cease to grow.
+             `;
         case 4:
-            return "This is Scene 4";
+            return `The GDP per capita versus GDP per capita growth plot shows that cities
+                in the United States are diverging in income per person. Richer cities are becoming
+                even wealthier relative to the average, while other cities are falling behind.
+                One possible reason this may occur is housing is constrained in 
+                rich cities so that only relatively wealthy people move to those rich cities 
+                because housing prices are so high. Meanwhile, relatively poor people move to 
+                cities where housing prices are low. Also, many housing constrained cities have high rates of highly educated immigrants. <br/><br/> 
+                Housing contrained San Francisco, New York City, and Boston grew faster
+                than the national average in income per person. 
+                The cities that were relatively rich in 2001 from the
+                previous plot that grew rapidly in population 
+                (Houston, Dallas, and Atlanta) grew slower than average in income per person.
+            `;
         case 5:
-            return "This is Scene 5";
+            return `France is an example of a country which is dominated heavily
+                by a single city: Paris. Paris is much larger and wealthier than
+                any other city in France. However, the chart shows that the population
+                of Paris did not even grow faster than the national average, in constrast to Tokyo, 
+                Japan. This is despite that Paris is 50% richer than national average, compared to 
+                20% richer for Tokyo. 
+                <br/><br/>
+                The fastest growing cities in France such as Rennes, Bordeaux, and Nantes are 
+                much poorer than Paris. This implies that housing is constrained in Paris,
+                as the population should have grown much faster considering how rich Paris
+                is relative to the national average.
+            `;
         case 6:
-            return "This is Scene 6";
+            return `The GDP per capita versus GDP per capita growth plot shows that Paris
+                is actually growing faster in wealth than any other city in France 
+                (again in contrast with Japan).  Similar to the United States, if housing was not constrained, productivity
+                would not have increased as much as people moving there would be poorer 
+                and less productive on average since housing prices would also be lower.
+                <br/><br/>
+                That's it for the slideshow as showing two plots of all 
+                10 countries will be long-winded and redundant.
+                Data for Australia, Canada, Germany, Italy, Poland, Spain, and the United Kingdom 
+                (and also the countries you've seen already)
+                are accessible through the dropdown menu below. You can choose whether to 
+                see GDP per capita growth or Population growth on the Y-Axis through
+                the other dropdown menu. 
+            `;
         default:
             return "This is Scene Undefined";
     }
@@ -273,7 +401,7 @@ function get_annotations(country, yaxis){
                   },
                   {
                     note: {
-                      label: "Nagoya is relatively rich and relatively fast population growth"
+                      label: "Nagoya is relatively rich and has relatively fast population growth"
                     },
                     type: d3.annotationCalloutCircle,
                     subject: {
@@ -286,12 +414,251 @@ function get_annotations(country, yaxis){
                     dx: 60
                   }
                 ];
+            case 'United States':
+                return [
+                  {
+                    note: {
+                      label: "San Francisco is the richest city and had below average population growth"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 20,        
+                    },
+                    color: ["green"],
+                    x: 608,
+                    y: 437,
+                    dy: 60,
+                    dx: 18
+                  },
+                  {
+                    note: {
+                      label: "New York City is the biggest city and is rich but has very low population growth"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 25,        
+                    },
+                    color: ["green"],
+                    x: 477,
+                    y: 480,
+                    dy: 25,
+                    dx: 0
+                  },
+                  {
+                    note: {
+                      label: "Houston"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 16,        
+                    },
+                    color: ["green"],
+                    x: 396,
+                    y: 268,
+                    dy: -125,
+                    dx: 0
+                  },
+                  {
+                    note: {
+                      label: "Dallas"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 16,        
+                    },
+                    color: ["green"],
+                    x: 377,
+                    y: 297,
+                    dy: -10,
+                    dx: 110
+                  },
+                  {
+                    note: {
+                      label: "Atlanta"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 16,        
+                    },
+                    color: ["green"],
+                    x: 457,
+                    y: 307,
+                    dy: 5,
+                    dx: 44
+                  }
+                ];
+            case 'France':
+                return [
+                  {
+                    note: {
+                      label: "Paris is by far the richest city in Japan and had only average population growth"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 40,        
+                    },
+                    color: ["green"],
+                    x: 697,
+                    y: 313,
+                    dy: 110,
+                    dx: -50
+                  },
+                  {
+                    note: {
+                      label: "Rennes, Bordeaux, and Nantes"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 35,        
+                    },
+                    color: ["green"],
+                    x: 395,
+                    y: 164,
+                    dy: -30,
+                    dx: 19
+                  }
+                ]; 
             default:
                 return [];
         }
     }
     else if (yaxis = "GDPGrowth"){
         switch(country){
+            case 'Japan':
+                return [
+                  {
+                    note: {
+                      label: "Tokyo is the richest city in Japan and had slower than average income growth"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 60,        
+                    },
+                    color: ["green"],
+                    x: 690,
+                    y: 387,
+                    dy: -180,
+                    dx: -100
+                  }
+                ];            
+            case 'United States':
+                return [
+                  {
+                    note: {
+                      label: "San Francisco was the richest city in 2001 and still grew GDP per capita the most of any city"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 25,        
+                    },
+                    color: ["green"],
+                    x: 610,
+                    y: 97,
+                    dy: 30,
+                    dx: 0
+                  },
+                  {
+                    note: {
+                      label: "Dallas"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 15,        
+                    },
+                    color: ["green"],
+                    x: 377,
+                    y: 361,
+                    dy: 66,
+                    dx: 5
+                  },
+                  {
+                    note: {
+                      label: "Houston"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 15,        
+                    },
+                    color: ["green"],
+                    x: 395,
+                    y: 377,
+                    dy: 15,
+                    dx: 0
+                  },
+                  {
+                    note: {
+                      label: "Atlanta"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 15,        
+                    },
+                    color: ["green"],
+                    x: 463,
+                    y: 424,
+                    dy: 30,
+                    dx: 0
+                  },
+                  {
+                    note: {
+                      label: "New York City"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 25,        
+                    },
+                    color: ["green"],
+                    x: 480,
+                    y: 264,
+                    dy: -30,
+                    dx: -30
+                  },
+                  {
+                    note: {
+                      label: "Boston"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 15,        
+                    },
+                    color: ["green"],
+                    x: 530,
+                    y: 267,
+                    dy: 30,
+                    dx: 30
+                  }
+                ];    
+            case 'France':
+                return [
+                  {
+                    note: {
+                      label: "Paris is the richest city in France by far and yet also had far the fastest GDP per capita growth"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 40,        
+                    },
+                    color: ["green"],
+                    x: 696,
+                    y: 165,
+                    dy: -10,
+                    dx: -50
+                  },
+                  {
+                    note: {
+                      label: "Many of the poorest cities in France reduced their GDP per capita from 2006 to 2018"
+                    },
+                    type: d3.annotationCalloutCircle,
+                    subject: {
+                      radius: 70,        
+                    },
+                    color: ["green"],
+                    x: 262,
+                    y: 466,
+                    dy: 20,
+                    dx: -65
+                  }
+                ]; 
             default:
                 return [];
         }
@@ -353,7 +720,7 @@ async function init(){
         }
         
         // Set Text
-        d3.select("#maintext").text(get_text(cur_scene));
+        d3.select("#maintext").html(get_text(cur_scene));
         
         if (cur_scene == 0){
             return;
@@ -597,6 +964,7 @@ async function init(){
         cur_scene = 0;
         set_all(unselected);
         d3.select(this).style('background-color', selected);
+        document.getElementById("bottomtext").setAttribute("hidden","hidden"); 
         document.getElementById("hiddenhr").setAttribute("hidden","hidden"); 
         document.getElementById("selectButton").setAttribute("hidden","hidden");
         document.getElementById("yaxisButton").setAttribute("hidden","hidden"); 
@@ -604,6 +972,7 @@ async function init(){
     });
     
     d3.select("#scene1").on("click", function() {  
+        document.getElementById("bottomtext").removeAttribute("hidden"); 
         cur_scene = 1;
         set_all(unselected);
         d3.select(this).style('background-color', selected);
@@ -612,6 +981,7 @@ async function init(){
         draw_chart(data, aggregate, "Japan", "PopulationGrowth");
     });
     d3.select("#scene2").on("click", function() {  
+        document.getElementById("bottomtext").removeAttribute("hidden"); 
         cur_scene = 2;
         set_all(unselected);
         d3.select(this).style('background-color', selected);
@@ -620,6 +990,7 @@ async function init(){
         draw_chart(data, aggregate, "Japan", "GDPGrowth");
     });
     d3.select("#scene3").on("click", function() {  
+        document.getElementById("bottomtext").removeAttribute("hidden"); 
         cur_scene = 3;
         set_all(unselected);
         d3.select(this).style('background-color', selected);
@@ -628,6 +999,7 @@ async function init(){
         draw_chart(data, aggregate, "United States", "PopulationGrowth");
     });
     d3.select("#scene4").on("click", function() {  
+        document.getElementById("bottomtext").removeAttribute("hidden"); 
         cur_scene = 4;
         set_all(unselected);
         d3.select(this).style('background-color', selected);
@@ -636,6 +1008,7 @@ async function init(){
         draw_chart(data, aggregate, "United States", "GDPGrowth");
     });
     d3.select("#scene5").on("click", function() {  
+        document.getElementById("bottomtext").removeAttribute("hidden"); 
         cur_scene = 5;
         set_all(unselected);
         d3.select(this).style('background-color', selected);
@@ -651,6 +1024,7 @@ async function init(){
         d3.select("#yaxisButton").property('value','GDP Growth on Y-Axis');
         draw_chart(data, aggregate, "France", "GDPGrowth");
         // Unhide Buttons
+        document.getElementById("bottomtext").removeAttribute("hidden"); 
         document.getElementById("hiddenhr").removeAttribute("hidden"); 
         document.getElementById("selectButton").removeAttribute("hidden");
         document.getElementById("yaxisButton").removeAttribute("hidden"); 
