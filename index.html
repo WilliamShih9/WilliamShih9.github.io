@@ -74,6 +74,7 @@ div.tooltip_reg {
 }
 
 select{
+	font-size: 18px;
     padding: 3px 1px; /* Some padding */
 }
 
@@ -108,8 +109,8 @@ p {
 
 <div style="text-align:center;">
 <hr id = "hiddenhr" style="height:2px;border-width:0;color:gray;background-color:gray" hidden="hidden">
-<select id="selectButton" hidden="hidden">></select>
-<select id="yaxisButton" hidden="hidden">></select>
+<select id="selectButton" hidden="hidden" disabled="true"></select>
+<select id="yaxisButton" hidden="hidden" disabled="true"></select>
 </div>
 
 
@@ -128,9 +129,11 @@ p {
     2010 to represent the midpoint of the range of years.<br/>
     3. The size of the circle represents the percent of the national population to keep 
     the circles consistent across plots. <br/> 4. The red lines 
-    represent the national average (all rural and urban areas combined). <br/> 5. Note that the 
+    represent the national average (all rural and urban areas combined). <br/> 5. The blue regression line uses
+	the population of the cities as weights, so larger cities have more influence on the line and smaller cities have less.
+	<br/> 6. Note that the 
     starting year and ending year differs between plots due to data limitations. 
-    <br/> 6. When hovering over the blue regression line,
+    <br/> 7. When hovering over the blue regression line,
     the R^2 and p-value of the regression line are shown. The higher the
     R^2 (ranging from 0 to 1), the better line fits the data. The lower the p-value,
     the greater the statistical significance of the observed difference of the regression line 
@@ -300,7 +303,7 @@ function get_text(num_scene){
                 housing laws that allow for housing construction even in population dense areas.
                 <br/>
                 If interested in specific details, 
-                hover over any line (red/blue) or circle to see more information. .
+                hover over any line (red/blue) or circle to see more information. Note that the area of each circle indicates the population of the metro area.
             `;
         case 2:
             return `A plot of GDP per capita versus GDP  per capita growth would 
@@ -369,11 +372,11 @@ function get_text(num_scene){
                 <br/><br/>
                 That's it for the slideshow as showing two plots of all 
                 10 countries will be long-winded and redundant.
-                Data for Australia, Canada, Germany, Italy, Poland, Spain, and the United Kingdom 
+                For more, plots for Australia, Canada, Germany, Italy, Poland, Spain, and the United Kingdom 
                 (and also the countries you've seen already)
                 are accessible through the dropdown menu below. You can choose whether to 
                 see GDP per capita growth or Population growth on the Y-Axis through
-                the other dropdown menu. 
+                the second dropdown menu. 
             `;
         default:
             return "This is Scene Undefined";
@@ -968,10 +971,14 @@ async function init(){
         document.getElementById("hiddenhr").setAttribute("hidden","hidden"); 
         document.getElementById("selectButton").setAttribute("hidden","hidden");
         document.getElementById("yaxisButton").setAttribute("hidden","hidden"); 
+        document.getElementById("selectButton").setAttribute("disabled","true");
+        document.getElementById("yaxisButton").setAttribute("disabled","true"); 
         draw_chart(data, aggregate, "Japan", "PopulationGrowth");
     });
     
     d3.select("#scene1").on("click", function() {  
+		document.getElementById("selectButton").setAttribute("disabled","true");
+        document.getElementById("yaxisButton").setAttribute("disabled","true"); 
         document.getElementById("bottomtext").removeAttribute("hidden"); 
         cur_scene = 1;
         set_all(unselected);
@@ -981,6 +988,8 @@ async function init(){
         draw_chart(data, aggregate, "Japan", "PopulationGrowth");
     });
     d3.select("#scene2").on("click", function() {  
+		document.getElementById("selectButton").setAttribute("disabled","true");
+        document.getElementById("yaxisButton").setAttribute("disabled","true"); 
         document.getElementById("bottomtext").removeAttribute("hidden"); 
         cur_scene = 2;
         set_all(unselected);
@@ -990,6 +999,8 @@ async function init(){
         draw_chart(data, aggregate, "Japan", "GDPGrowth");
     });
     d3.select("#scene3").on("click", function() {  
+		document.getElementById("selectButton").setAttribute("disabled","true");
+        document.getElementById("yaxisButton").setAttribute("disabled","true"); 
         document.getElementById("bottomtext").removeAttribute("hidden"); 
         cur_scene = 3;
         set_all(unselected);
@@ -998,7 +1009,9 @@ async function init(){
         d3.select("#yaxisButton").property('value','Population Growth on Y-Axis');
         draw_chart(data, aggregate, "United States", "PopulationGrowth");
     });
-    d3.select("#scene4").on("click", function() {  
+    d3.select("#scene4").on("click", function() {
+		document.getElementById("selectButton").setAttribute("disabled","true");
+        document.getElementById("yaxisButton").setAttribute("disabled","true"); 
         document.getElementById("bottomtext").removeAttribute("hidden"); 
         cur_scene = 4;
         set_all(unselected);
@@ -1008,6 +1021,8 @@ async function init(){
         draw_chart(data, aggregate, "United States", "GDPGrowth");
     });
     d3.select("#scene5").on("click", function() {  
+		document.getElementById("selectButton").setAttribute("disabled","true");
+        document.getElementById("yaxisButton").setAttribute("disabled","true"); 
         document.getElementById("bottomtext").removeAttribute("hidden"); 
         cur_scene = 5;
         set_all(unselected);
@@ -1026,8 +1041,10 @@ async function init(){
         // Unhide Buttons
         document.getElementById("bottomtext").removeAttribute("hidden"); 
         document.getElementById("hiddenhr").removeAttribute("hidden"); 
-        document.getElementById("selectButton").removeAttribute("hidden");
+		document.getElementById("selectButton").removeAttribute("hidden"); 
         document.getElementById("yaxisButton").removeAttribute("hidden"); 
+        document.getElementById("selectButton").disabled = false;
+        document.getElementById("yaxisButton").disabled = false; 
         
         d3.select("#selectButton")
             .on("change", function (event){
